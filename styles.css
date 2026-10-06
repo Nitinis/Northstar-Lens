@@ -153,9 +153,23 @@ h1 {
 }
 
 .result-count {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
   margin: 0;
   color: var(--muted);
   font-weight: 700;
+}
+
+.status-bar[data-state="loading"] .result-count::before {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 1rem;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  content: "";
+  animation: spin 0.8s linear infinite;
 }
 
 .empty-state {
@@ -223,6 +237,12 @@ h1 {
   border: 0;
 }
 
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (max-width: 640px) {
   .topbar {
     padding-top: 1rem;
@@ -243,5 +263,11 @@ h1 {
   .status-bar {
     flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-bar[data-state="loading"] .result-count::before {
+    animation: none;
   }
 }

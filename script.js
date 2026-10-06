@@ -4,9 +4,10 @@ const results = document.getElementById("results");
 const resultCount = document.getElementById("result-count");
 const emptyState = document.getElementById("empty-state");
 const clearButton = document.getElementById("clear-button");
+const statusBar = document.querySelector(".status-bar");
 let searchId = 0;
 
-function render(items) {
+function render(items, query) {
   results.innerHTML = "";
 
   items.forEach((item) => {
@@ -37,9 +38,14 @@ function render(items) {
   });
 
   const count = results.childElementCount;
-  resultCount.textContent = `Showing ${count} ${count === 1 ? "result" : "results"}`;
+  statusBar.dataset.state = count === 0 ? "empty" : "results";
+  resultCount.textContent = count === 0
+    ? `No results for "${query}".`
+    : `Showing ${count} ${count === 1 ? "result" : "results"} for "${query}".`;
   emptyState.hidden = count > 0;
-  if (count === 0) emptyState.textContent = "No images found. Try another search.";
+  if (count === 0) {
+    emptyState.textContent = "No images found. Try another search.";
+  }
 }
 
 async function search(query, requestId) {
@@ -58,7 +64,7 @@ async function search(query, requestId) {
   const items = data.query && data.query.pages
     ? Object.values(data.query.pages)
     : [];
-  render(items);
+  render(items, query);
 }
 
 form.addEventListener("submit", async (event) => {
@@ -67,8 +73,11 @@ form.addEventListener("submit", async (event) => {
   if (!query) return;
 
   const requestId = ++searchId;
+  statusBar.dataset.state = "loading";
   resultCount.textContent = `Searching for "${query}"...`;
   emptyState.hidden = true;
+  results.innerHTML = "";
+  results.setAttribute("aria-busy", "true");
 
   try {
     await search(query, requestId);
@@ -76,9 +85,16 @@ form.addEventListener("submit", async (event) => {
     if (requestId !== searchId) return;
     console.error(error);
     results.innerHTML = "";
-    resultCount.textContent = "Search failed";
+    results.setAttribute("aria-busy", "false");
+    statusBar.dataset.state = "error";
+    resultCount.textContent = "Search failed.";
     emptyState.textContent = "Could not load images. Please try again.";
     emptyState.hidden = false;
+    return;
+  }
+
+  if (requestId === searchId) {
+    results.setAttribute("aria-busy", "false");
   }
 });
 
@@ -93,6 +109,8 @@ clearButton.addEventListener("click", () => {
   searchId += 1;
   input.value = "";
   results.innerHTML = "";
+  results.setAttribute("aria-busy", "false");
+  statusBar.dataset.state = "idle";
   resultCount.textContent = "Showing 0 results";
   emptyState.textContent = "Search to see results";
   emptyState.hidden = false;
