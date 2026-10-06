@@ -176,6 +176,41 @@ h1 {
   align-items: start;
 }
 
+.card {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--panel-strong);
+  box-shadow: 0 8px 20px var(--shadow);
+}
+
+.card a {
+  display: block;
+  overflow: hidden;
+  background: var(--bg-accent);
+}
+
+.card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  transition: transform 0.2s ease;
+}
+
+.card a:hover img {
+  transform: scale(1.03);
+}
+
+.card p {
+  margin: 0;
+  padding: 0.9rem 1rem 1rem;
+  color: var(--text);
+  font-weight: 600;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
